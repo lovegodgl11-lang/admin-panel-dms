@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
+  "imports": {}
+}</script></head><body>
+
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Dump Money Solution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #1f2937; --primary-hover: #111827; --secondary-color: #f3f4f6;
+        --text-color: #111827; --text-light: #6b7280; --border-color: #d1d5db;
+        --background-color: #f9fafb; --card-background: #ffffff; --danger-color: #ef4444;
+        --success-color: #22c55e; --font-family: 'Inter', sans-serif; --border-radius: 0.5rem;
+        --box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: var(--font-family); background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 2rem 1rem; }
+      #root { width: 100%; max-width: 1200px; }
+      .container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+      .page { width: 100%; display: none; }
+      .page.active { display: block; }
+
+      .auth-card { background-color: var(--card-background); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 2.5rem; width: 100%; max-width: 450px; border: 1px solid var(--border-color); margin: 0 auto; }
+      .auth-card h1 { font-size: 1.75rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+      .auth-card p { text-align: center; color: var(--text-light); margin-bottom: 2rem; }
+      .form-group { margin-bottom: 1.25rem; }
+      .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.875rem; }
+      .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border-radius: var(--border-radius); border: 1px solid var(--border-color); font-size: 1rem; font-family: inherit; background-color: #fff; }
+      .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.2); }
+      .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+      
+      .btn { padding: 0.875rem 1rem; border: none; border-radius: var(--border-radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; display: inline-flex; justify-content: center; align-items: center; gap: 0.5rem; }
+      .btn-primary { background-color: var(--primary-color); color: white; }
+      .btn-primary:hover { background-color: var(--primary-hover); }
+      .btn-success { background-color: var(--success-color); color: white; }
+      .btn-danger { background-color: var(--danger-color); color: white; }
+      .btn-secondary { background-color: var(--secondary-color); color: var(--text-color); border: 1px solid var(--border-color); }
+      .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+
+      .error-message { color: var(--danger-color); text-align: center; margin-bottom: 1rem; }
+      .dashboard-container { width: 100%; }
+      .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+      .dashboard-header h1 { font-size: 2.25rem; }
+      .header-actions { display: flex; align-items: center; gap: 1rem; }
+      .nav-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      .nav-buttons .btn { width: auto; margin-right: 1rem; background-color: transparent; border: 1px solid var(--border-color); color: var(--text-light); }
+      .nav-buttons .btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+      .btn-logout { padding: 0.5rem 1rem; background-color: var(--secondary-color); color: var(--text-color); width: auto; border: 1px solid var(--border-color); }
+      
+      .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+      .stat-card { background-color: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--box-shadow); }
+      .stat-card h3 { color: var(--text-light); font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem; }
+      .stat-card p { font-size: 2rem; font-weight: 700; }
+      
+      .card { background-color: #fff; border-radius: 0.5rem; box-shadow: var(--box-shadow); overflow: hidden; border: 1px solid var(--border-color); }
+      .table-container { max-height: 65vh; overflow-y: auto; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+      th { background-color: var(--secondary-color); font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; position: sticky; top: 0; z-index: 2; cursor: pointer; user-select: none;}
+      .sort-indicator { display: inline-block; margin-left: 0.25rem; opacity: 0.4; transition: opacity 0.2s, transform 0.2s;}
+      th.sorted-asc .sort-indicator, th.sorted-desc .sort-indicator { opacity: 1; }
+      th.sorted-desc .sort-indicator { transform: rotate(180deg); }
+      
+      .table-controls { padding: 1rem; background: var(--card-background); border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;}
+      .search-input { padding: 0.6rem 0.8rem; border-radius: var(--border-radius); border: 1px solid var(--border-color); width: 100%; max-width: 350px;}
+      .table-footer { background-color: var(--secondary-color); font-weight: 700;}
+      .table-footer td { border-top: 2px solid var(--text-color); font-size: 1.1rem; }
+      .filters-container { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+      .filters-container .form-group { margin-bottom: 0; }
+      .filters-container label { margin-right: 0.5rem; }
+      .filters-container input, .filters-container select { padding: 0.6rem 0.8rem; }
+
+      .screenshot-link { color: var(--primary-color); text-decoration: underline; }
+      .link { color: var(--primary-hover); cursor: pointer; font-weight: 500; text-decoration: none; }
+      .link:hover { text-decoration: underline; }
+      .page-subheader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+      .page-subheader h2 { font-size: 1.5rem; color: var(--text-color); }
+      .btn-icon { background: none; border: none; padding: 0.5rem; cursor: pointer; }
+
+      /* Notification Bell */
+      .notification-bell { position: relative; }
+      .notification-bell .btn-icon { font-size: 1.5rem; color: var(--text-light); }
+      .badge { position: absolute; top: 0; right: 0; background-color: var(--danger-color); color: white; width: 1.25rem; height: 1.25rem; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 700; }
+      .notification-dropdown { display: none; position: absolute; top: calc(100% + 10px); right: 0; background-color: white; border-radius: var(--border-radius); box-shadow: var(--box-shadow); width: 350px; z-index: 10; border: 1px solid var(--border-color); }
+      .notification-dropdown.active { display: block; }
+      .notification-dropdown-header { padding: 0.75rem 1rem; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+      .notification-dropdown-body { max-height: 300px; overflow-y: auto; }
+      .notification-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.875rem; }
+      .notification-item:last-child { border: none; }
+      
+      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100;}
+
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+      .modal-content { background: white; padding: 2rem; border-radius: var(--border-radius); width: 90%; max-width: 500px; animation: fadeIn 0.3s ease; }
+
+      @media (max-width: 992px) { .nav-buttons { flex-wrap: wrap; gap: 0.5rem; } .nav-buttons .btn { margin-right: 0; } }
+      @media (max-width: 768px) {
+        body { padding: 1rem; }
+        .dashboard-header { flex-direction: column; align-items: flex-start; }
+        .nav-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        .auth-card, .card { padding: 1.5rem; }
+        .dashboard-header h1 { font-size: 1.75rem; }
+      }
+       @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+    </style>
+  
+
+  <div id="root">
+    <div class="container">
+        <div id="loading-page" class="page active"><p>Loading...</p></div>
+        
+        <div id="admin-login-page" class="page">
+            <div class="auth-card">
+                <h1>Admin Panel</h1> <p>Please sign in to continue.</p>
+                <form id="admin-login-form">
+                    <p id="login-error" class="error-message" style="display: none;"></p>
+                    <div class="form-group"><label for="admin-email">Admin Email</label><input type="email" id="admin-email" name="email" required=""></div>
+                    <div class="form-group"><label for="admin-password">Password</label><input type="password" id="admin-password" name="password" required=""></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+                </form>
+                 <p style="text-align: center; margin-top: 1.5rem;">Need an account? <span class="link" id="go-to-signup">Sign Up</span></p>
+            </div>
+        </div>
+
+        <div id="admin-signup-page" class="page">
+             <div class="auth-card">
+                <h1>Create Admin Account</h1> <p>Registration is restricted.</p>
+                <form id="admin-signup-form">
+                    <p id="signup-error" class="error-message" style="display: none;"></p>
+                    <div class="form-group"><label for="admin-signup-name">Full Name</label><input type="text" id="admin-signup-name" name="name" required=""></div>
+                    <div class="form-group"><label for="admin-signup-email">Admin Email</label><input type="email" id="admin-signup-email" name="email" required="" placeholder="name@dms-admin.com"></div>
+                    <div class="form-group"><label for="admin-signup-password">Password</label><input type="password" id="admin-signup-password" name="password" required=""></div>
+                    <div class="form-group"><label for="admin-secret">Admin Secret Key</label><input type="password" id="admin-secret" name="secret" required=""></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+                </form>
+                 <p style="text-align: center; margin-top: 1.5rem;">Already have an account? <span class="link" id="go-to-login">Sign In</span></p>
+            </div>
+        </div>
+
+        <div id="admin-dashboard-page" class="page">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h1>Welcome, Admin!</h1>
+                    <div class="header-actions">
+                        <span class="nav-buttons">
+                            <button id="nav-overview" class="btn active">Overview</button>
+                            <button id="nav-shops" class="btn">Shops</button>
+                            <button id="nav-salesmen" class="btn">Salesmen</button>
+                            <button id="nav-delivery" class="btn">Delivery Boys</button>
+                            <button id="nav-topups" class="btn">Top-up Requests</button>
+                            <button id="nav-manual-topup" class="btn">Manual Top-up</button>
+                            <button id="nav-shop-ledger" class="btn">Shop Ledger</button>
+                            <button id="nav-customer-ledger" class="btn">Customer Ledger</button>
+                            <button id="nav-promo" class="btn">Promo Codes</button>
+                            <button id="nav-settings" class="btn">Settings</button>
+                        </span>
+                        <div class="notification-bell">
+                            <button class="btn-icon" id="admin-notification-btn">🔔</button>
+                            <span id="admin-notification-badge" class="badge" style="display: none;"></span>
+                            <div class="notification-dropdown" id="admin-notification-dropdown">
+                                <div class="notification-dropdown-header">Low Stock Alerts</div>
+                                <div class="notification-dropdown-body" id="admin-notification-list"></div>
+                            </div>
+                        </div>
+                        <button id="admin-logout-button" class="btn btn-logout">Logout</button>
+                    </div>
+                </div>
+                <div id="dashboard-content"></div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, runTransaction, addDoc, serverTimestamp, query, where, onSnapshot, deleteDoc, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyA2yF3_AdR-GFhkJudVQn5nMj2tjq7uRsA",
+        authDomain: "dump-money-cfd01.firebaseapp.com",
+        databaseURL: "https://dump-money-cfd01-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dump-money-cfd01",
+        storageBucket: "dump-money-cfd01.appspot.com",
+        messagingSenderId: "589708288715",
+        appId: "1:589708288715:web:1031ab4eb2a767bf92314e",
+        measurementId: "G-8JPWPL06C0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const pages = document.querySelectorAll('.page');
+    const dashboardContent = document.getElementById('dashboard-content');
+    const navButtons = document.querySelectorAll('.nav-buttons .btn');
+    let listeners = [];
+    let originalData = [];
+    let currentSort = { column: null, direction: 'asc' };
+    
+    let renderOverview, renderShops, displayShops, renderSalesmen, displaySalesmen, renderShopLedger, displayShopLedger, renderCustomerLedger, displayCustomerLedger, renderSettings, renderTopupRequests, renderManualTopup, listenForLowStockAlerts, renderPromoCodes, displayPromoCodes, renderDeliveryBoys, displayDeliveryBoys;
+
+    const cleanupListeners = () => {
+        listeners.forEach(unsubscribe => unsubscribe());
+        listeners = [];
+        originalData = [];
+        currentSort = { column: null, direction: 'asc' };
+    };
+
+    const showPage = (pageId) => pages.forEach(page => page.classList.toggle('active', page.id === pageId));
+    
+    onAuthStateChanged(auth, async (user) => {
+        try {
+            cleanupListeners();
+            if (user && user.email.endsWith('@dms-admin.com')) {
+                showPage('admin-dashboard-page');
+                setActiveNav('nav-overview');
+                await renderOverview();
+                listenForLowStockAlerts();
+            } else {
+                if (user) {
+                   await signOut(auth); // Explicitly sign out non-admin users
+                }
+                showPage('admin-login-page');
+            }
+        } catch (error) {
+            console.error("Critical error during auth state change:", error);
+            if (auth.currentUser) {
+                await signOut(auth).catch(e => console.error("Sign out failed:", e));
+            }
+            showPage('admin-login-page');
+        }
+    });
+
+    document.getElementById('go-to-signup').addEventListener('click', () => showPage('admin-signup-page'));
+    document.getElementById('go-to-login').addEventListener('click', () => showPage('admin-login-page'));
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => { e.preventDefault(); const email = e.target.elements.email.value; const password = e.target.elements.password.value; const errorEl = document.getElementById('login-error'); errorEl.style.display = 'none'; try { if (!email.endsWith('@dms-admin.com')) { throw new Error('Invalid admin email address.'); } await signInWithEmailAndPassword(auth, email, password); } catch (error) { errorEl.textContent = error.message; errorEl.style.display = 'block'; } });
+    
+    document.getElementById('admin-signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const { name, email, password, secret } = e.target.elements;
+        const errorEl = document.getElementById('signup-error');
+        errorEl.style.display = 'none';
+        
+        const ADMIN_SECRET_KEY = "DMS_ADMIN_SECRET_2024";
+
+        if (!email.value.endsWith('@dms-admin.com')) {
+            errorEl.textContent = 'Invalid email. Must be a "@dms-admin.com" address.';
+            errorEl.style.display = 'block';
+            return;
+        }
+        if (secret.value !== ADMIN_SECRET_KEY) {
+            errorEl.textContent = 'Invalid Admin Secret Key.';
+            errorEl.style.display = 'block';
+            return;
+        }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+            await setDoc(doc(db, 'admins', userCredential.user.uid), {
+                name: name.value,
+                email: email.value,
+                createdAt: serverTimestamp(),
+            });
+            alert('Admin account created successfully! You will now be redirected.');
+        } catch (error) {
+            errorEl.textContent = error.message;
+            errorEl.style.display = 'block';
+        }
+    });
+
+    document.getElementById('admin-logout-button').addEventListener('click', () => signOut(auth));
+
+    const setActiveNav = (navId) => navButtons.forEach(btn => btn.classList.toggle('active', btn.id === navId));
+
+    const handleSort = (column, displayFunc, searchInputId = 'table-search') => {
+        const header = dashboardContent.querySelector(`th[data-sort="${column}"]`);
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+        
+        dashboardContent.querySelectorAll('th[data-sort]').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+        });
+
+        if (header) {
+            header.classList.add(currentSort.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+
+        displayFunc();
+    };
+
+    renderOverview = async () => {
+        dashboardContent.innerHTML = `<div class="stats-grid" id="stats-grid-container">
+            <div class="stat-card"><h3>Total Shops</h3><p>...</p></div>
+            <div class="stat-card"><h3>Total Customers</h3><p>...</p></div>
+            <div class="stat-card"><h3>Total Salesmen</h3><p>...</p></div>
+            <div class="stat-card"><h3>Total Revenue</h3><p>...</p></div>
+        </div>`;
+        try {
+            const [shopsSnap, customersSnap, salesmenSnap, ordersSnap] = await Promise.all([
+                getDocs(collection(db, 'shops')),
+                getDocs(collection(db, 'customers')),
+                getDocs(collection(db, 'salesmen')),
+                getDocs(collection(db, 'orders'))
+            ]);
+            const totalRevenue = ordersSnap.docs.reduce((sum, doc) => sum + doc.data().total, 0);
+            
+            document.getElementById('stats-grid-container').innerHTML = `
+                <div class="stat-card"><h3>Total Shops</h3><p>${shopsSnap.size}</p></div>
+                <div class="stat-card"><h3>Total Customers</h3><p>${customersSnap.size}</p></div>
+                <div class="stat-card"><h3>Total Salesmen</h3><p>${salesmenSnap.size}</p></div>
+                <div class="stat-card"><h3>Total Revenue</h3><p>₹${totalRevenue.toFixed(2)}</p></div>
+            `;
+        } catch (error) {
+            dashboardContent.innerHTML = `<p>Error loading overview data: ${error.message}</p>`;
+        }
+    };
+    
+    renderTopupRequests = () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader"><h2>Top-up Requests</h2></div>
+            <div class="card"><div class="table-container"><table>
+                <thead><tr><th>Customer Name</th><th>Amount (₹)</th><th>Screenshot</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center;">Loading...</td></tr></tbody>
+            </table></div></div>`;
+        const q = query(collection(db, 'topupRequests'), where('status', '==', 'pending'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const body = document.getElementById('data-table-body');
+            const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (requests.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No pending requests.</td></tr>`;
+                return;
+            }
+            body.innerHTML = requests.map(req => `
+                <tr>
+                    <td>${req.customerName}</td>
+                    <td>${req.amount.toFixed(2)}</td>
+                    <td><a href="${req.screenshotBase64}" target="_blank" class="screenshot-link">View</a></td>
+                    <td>${new Date(req.createdAt.seconds * 1000).toLocaleString()}</td>
+                    <td style="display:flex; gap:0.5rem">
+                        <button class="btn btn-success" data-action="approve" data-id="${req.id}" data-customer-id="${req.customerId}" data-amount="${req.amount}" style="padding:0.25rem 0.5rem;font-size:0.8rem">Approve</button>
+                        <button class="btn btn-danger" data-action="reject" data-id="${req.id}" data-customer-id="${req.customerId}" data-amount="${req.amount}" style="padding:0.25rem 0.5rem;font-size:0.8rem">Reject</button>
+                    </td>
+                </tr>`).join('');
+        }, (error) => {
+            console.error("Error fetching topup requests:", error);
+            const body = document.getElementById('data-table-body');
+            body.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--danger-color);">Error loading requests.</td></tr>`;
+        });
+        listeners.push(unsubscribe);
+    };
+
+    renderManualTopup = async () => {
+        dashboardContent.innerHTML = `<div class="page-subheader"><h2>Manual Wallet Top-up</h2></div>
+            <div class="card" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+                <form id="manual-topup-form">
+                    <div class="form-group"><label for="customer-select">Select Customer</label><select id="customer-select" required><option value="">Loading customers...</option></select></div>
+                    <div class="form-group"><label for="manual-amount">Amount (₹)</label><input type="number" id="manual-amount" min="1" required></div>
+                    <div class="form-group"><label for="manual-reason">Reason</label><input type="text" id="manual-reason" placeholder="e.g., Refund, Bonus" required></div>
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Add Funds</button>
+                </form>
+            </div>`;
+        const select = document.getElementById('customer-select');
+        try {
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            select.innerHTML = '<option value="">-- Select a customer --</option>' + customersSnap.docs.map(doc => `<option value="${doc.id}">${doc.data().name} (${doc.data().email})</option>`).join('');
+        } catch (e) { select.innerHTML = `<option value="">Could not load customers</option>`; }
+    };
+    
+    renderSettings = async () => {
+        dashboardContent.innerHTML = `<div class="page-subheader"><h2>Settings</h2></div>
+            <div class="card" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+                <h3>Payment Details</h3>
+                <form id="settings-form">
+                    <div class="form-group"><label for="upiId">UPI ID</label><input type="text" id="upiId" required></div>
+                    <div class="form-group"><label for="qrCodeUrl">QR Code Image URL</label><input type="url" id="qrCodeUrl" required></div>
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Save Settings</button>
+                </form>
+            </div>`;
+        try {
+            const settingsDoc = await getDoc(doc(db, 'settings', 'paymentDetails'));
+            if (settingsDoc.exists()) {
+                document.getElementById('upiId').value = settingsDoc.data().upiId || '';
+                document.getElementById('qrCodeUrl').value = settingsDoc.data().qrCodeUrl || '';
+            }
+        } catch (e) { alert('Could not load settings.'); }
+    };
+
+    listenForLowStockAlerts = () => { /* ... (implementation is missing, can be added later if needed) ... */ };
+
+    renderShops = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader"><h2>Registered Shops</h2></div>
+            <div class="card">
+                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by shop name, email, or mobile..."></div>
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="shopName">Shop Name <span class="sort-indicator">▲</span></th>
+                        <th data-sort="email">Email <span class="sort-indicator">▲</span></th>
+                        <th data-sort="mobile">Mobile <span class="sort-indicator">▲</span></th>
+                        <th data-sort="address">Address <span class="sort-indicator">▲</span></th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
+                </table></div>
+            </div>`;
+        try {
+            const snap = await getDocs(collection(db, 'shops'));
+            originalData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            displayShops();
+            document.getElementById('table-search').addEventListener('input', (e) => displayShops(e.target.value));
+            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displayShops);
+            });
+        } catch (e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="5">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displayShops = (searchTerm = '') => {
+        const body = document.getElementById('data-table-body');
+        let filteredData = [...originalData];
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            filteredData = filteredData.filter(s => s.shopName.toLowerCase().includes(lower) || s.email.toLowerCase().includes(lower) || (s.mobile||'').includes(lower));
+        }
+        if (currentSort.column) {
+            filteredData.sort((a, b) => {
+                const valA = a[currentSort.column] || ''; const valB = b[currentSort.column] || '';
+                if (typeof valA === 'string') return currentSort.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        body.innerHTML = filteredData.length ? filteredData.map(s => `<tr>
+            <td>${s.shopName}</td><td>${s.email}</td><td>${s.mobile || 'N/A'}</td><td>${s.address || 'N/A'}</td>
+            <td style="display:flex; gap:0.5rem">
+                <button class="btn btn-secondary" data-action="edit" data-id="${s.id}" data-collection="shops" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
+                <button class="btn btn-danger" data-action="delete" data-id="${s.id}" data-collection="shops" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
+            </td></tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No shops found.</td></tr>`;
+    };
+    
+    renderSalesmen = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader">
+                <h2>Registered Salesmen</h2>
+                <button id="add-salesman-btn" class="btn btn-primary" style="width: auto;">+ Add Salesman</button>
+            </div>
+            <div class="card">
+                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by name, email, or shop..."></div>
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="name">Name <span class="sort-indicator">▲</span></th>
+                        <th data-sort="email">Email <span class="sort-indicator">▲</span></th>
+                        <th data-sort="shopName">Shop <span class="sort-indicator">▲</span></th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="data-table-body"><tr><td colspan="4" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
+                </table></div>
+            </div>
+            <div id="salesman-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="padding:0;">
+                <form id="salesman-form" style="padding: 2rem;">
+                    <h2 id="salesman-modal-title" style="margin-bottom: 1.5rem;">Add Salesman</h2>
+                    <input type="hidden" id="salesman-id" />
+                    <div class="form-group"><label for="salesman-name">Full Name</label><input type="text" id="salesman-name" required></div>
+                    <div class="form-group"><label for="salesman-email">Email</label><input type="email" id="salesman-email" required></div>
+                    <div class="form-group"><label for="salesman-shop">Assign to Shop</label><select id="salesman-shop" required><option value="">Loading shops...</option></select></div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" id="cancel-salesman-modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Salesman</button>
+                    </div>
+                </form>
+            </div></div>`;
+        try {
+            const [salesmenSnap, shopsSnap] = await Promise.all([getDocs(collection(db, 'salesmen')), getDocs(collection(db, 'shops'))]);
+            const shopsMap = new Map(shopsSnap.docs.map(doc => [doc.id, doc.data().shopName]));
+            originalData = salesmenSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), shopName: shopsMap.get(doc.data().shopId) || 'N/A' }));
+            
+            const select = dashboardContent.querySelector('#salesman-shop');
+            if(select) {
+                select.innerHTML = '<option value="">-- Select a shop --</option>' + shopsSnap.docs.map(doc => `<option value="${doc.id}">${doc.data().shopName}</option>`).join('');
+            }
+
+            displaySalesmen();
+            document.getElementById('table-search').addEventListener('input', (e) => displaySalesmen(e.target.value));
+            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displaySalesmen);
+            });
+        } catch (e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="4">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displaySalesmen = (searchTerm = '') => {
+        const body = document.getElementById('data-table-body');
+        let filteredData = [...originalData];
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            filteredData = filteredData.filter(s => s.name.toLowerCase().includes(lower) || s.email.toLowerCase().includes(lower) || (s.shopName || '').toLowerCase().includes(lower));
+        }
+        if (currentSort.column) {
+             filteredData.sort((a, b) => {
+                const valA = a[currentSort.column] || ''; const valB = b[currentSort.column] || '';
+                if (typeof valA === 'string') return currentSort.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        body.innerHTML = filteredData.length ? filteredData.map(s => `<tr>
+            <td>${s.name}</td><td>${s.email}</td><td>${s.shopName}</td>
+            <td style="display:flex; gap:0.5rem">
+                <button class="btn btn-secondary" data-action="edit" data-id="${s.id}" data-collection="salesmen" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
+                <button class="btn btn-danger" data-action="delete" data-id="${s.id}" data-collection="salesmen" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
+            </td></tr>`).join('') : `<tr><td colspan="4" style="text-align:center; padding: 2rem;">No salesmen found.</td></tr>`;
+    };
+
+    renderDeliveryBoys = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader">
+                <h2>Delivery Boys</h2>
+                <button id="add-delivery-boy-btn" class="btn btn-primary" style="width: auto;">+ Add Delivery Boy</button>
+            </div>
+            <div class="card">
+                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by name, email, or mobile..."></div>
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="name">Name <span class="sort-indicator">▲</span></th>
+                        <th data-sort="email">Email <span class="sort-indicator">▲</span></th>
+                        <th data-sort="mobile">Mobile <span class="sort-indicator">▲</span></th>
+                        <th data-sort="status">Status <span class="sort-indicator">▲</span></th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
+                </table></div>
+            </div>
+             <div id="delivery-boy-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="padding:0;">
+                <form id="delivery-boy-form" style="padding: 2rem;">
+                    <h2 id="delivery-boy-modal-title" style="margin-bottom: 1.5rem;">Add Delivery Boy</h2>
+                    <input type="hidden" id="delivery-boy-id" />
+                    <div class="form-group"><label for="delivery-boy-name">Full Name</label><input type="text" id="delivery-boy-name" required></div>
+                    <div class="form-group"><label for="delivery-boy-email">Email</label><input type="email" id="delivery-boy-email" required></div>
+                    <div class="form-group"><label for="delivery-boy-mobile">Mobile Number</label><input type="tel" id="delivery-boy-mobile" required></div>
+                    <div class="form-group" id="password-form-group" style="display:none;"><label for="delivery-boy-password">Password</label><input type="password" id="delivery-boy-password" required minlength="6"></div>
+                    <div class="form-group"><label for="delivery-boy-status">Status</label><select id="delivery-boy-status" required><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                    <p style="font-size: 0.8rem; color: var(--text-light);">Delivery boys will create their own password upon first login.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" id="cancel-delivery-boy-modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div></div>`;
+        try {
+            const snap = await getDocs(collection(db, 'deliveryBoys'));
+            originalData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            displayDeliveryBoys();
+            document.getElementById('table-search').addEventListener('input', (e) => displayDeliveryBoys(e.target.value));
+            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displayDeliveryBoys);
+            });
+        } catch(e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="5">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displayDeliveryBoys = (searchTerm = '') => {
+        const body = document.getElementById('data-table-body');
+        let filteredData = [...originalData];
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            filteredData = filteredData.filter(d => d.name.toLowerCase().includes(lower) || d.email.toLowerCase().includes(lower) || (d.mobile||'').includes(lower));
+        }
+        if (currentSort.column) {
+            filteredData.sort((a, b) => {
+                const valA = a[currentSort.column] || ''; const valB = b[currentSort.column] || '';
+                return currentSort.direction === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+        }
+        body.innerHTML = filteredData.length ? filteredData.map(d => `<tr>
+            <td>${d.name}</td><td>${d.email}</td><td>${d.mobile || 'N/A'}</td>
+            <td><span style="color: ${d.status === 'active' ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: bold;">${d.status}</span></td>
+            <td style="display:flex; gap:0.5rem">
+                <button class="btn btn-secondary" data-action="edit" data-id="${d.id}" data-collection="deliveryBoys" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
+                <button class="btn btn-danger" data-action="delete" data-id="${d.id}" data-collection="deliveryBoys" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
+            </td></tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No delivery boys found.</td></tr>`;
+    };
+
+    renderShopLedger = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader"><h2>Shop Ledger</h2></div>
+            <div class="card">
+                <div class="table-controls">
+                    <div class="filters-container">
+                        <div class="form-group"><label for="shop-filter">Shop:</label><select id="shop-filter"><option value="">All Shops</option></select></div>
+                        <div class="form-group"><label for="start-date-filter">From:</label><input type="date" id="start-date-filter"></div>
+                        <div class="form-group"><label for="end-date-filter">To:</label><input type="date" id="end-date-filter"></div>
+                        <button id="apply-filters-btn" class="btn btn-primary" style="padding: 0.6rem 1rem; width:auto;">Apply</button>
+                    </div>
+                    <input type="text" id="table-search" class="search-input" placeholder="Search by customer or order ID...">
+                </div>
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="id">Order ID <span class="sort-indicator">▲</span></th>
+                        <th data-sort="shopName">Shop Name <span class="sort-indicator">▲</span></th>
+                        <th data-sort="customerName">Customer Name <span class="sort-indicator">▲</span></th>
+                        <th data-sort="createdAt">Date <span class="sort-indicator">▲</span></th>
+                        <th data-sort="total">Amount (₹) <span class="sort-indicator">▲</span></th>
+                    </tr></thead>
+                    <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
+                    <tfoot class="table-footer"><tr id="ledger-total-row"></tr></tfoot>
+                </table></div>
+            </div>`;
+        try {
+            const [ordersSnap, shopsSnap] = await Promise.all([getDocs(collection(db, 'orders')), getDocs(collection(db, 'shops'))]);
+            const shopsMap = new Map(shopsSnap.docs.map(doc => [doc.id, doc.data().shopName]));
+            originalData = ordersSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), shopName: shopsMap.get(doc.data().shopId) || 'Unknown Shop' }));
+            
+            const shopFilter = document.getElementById('shop-filter');
+            shopFilter.innerHTML += shopsSnap.docs.map(doc => `<option value="${doc.data().shopName}">${doc.data().shopName}</option>`).join('');
+
+            displayShopLedger();
+
+            document.getElementById('apply-filters-btn').addEventListener('click', displayShopLedger);
+            document.getElementById('table-search').addEventListener('input', displayShopLedger);
+            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displayShopLedger);
+            });
+        } catch (e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="5">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displayShopLedger = () => {
+        const body = document.getElementById('data-table-body');
+        const searchTerm = document.getElementById('table-search').value.toLowerCase();
+        const selectedShop = document.getElementById('shop-filter').value;
+        const startDate = document.getElementById('start-date-filter').value;
+        const endDate = document.getElementById('end-date-filter').value;
+
+        let filteredData = [...originalData];
+
+        if (searchTerm) {
+            filteredData = filteredData.filter(o => o.id.toLowerCase().includes(searchTerm) || o.customerName.toLowerCase().includes(searchTerm));
+        }
+        if (selectedShop) {
+            filteredData = filteredData.filter(o => o.shopName === selectedShop);
+        }
+        if (startDate) {
+            const start = new Date(startDate).getTime() / 1000;
+            filteredData = filteredData.filter(o => o.createdAt.seconds >= start);
+        }
+        if (endDate) {
+            const end = new Date(endDate).setHours(23, 59, 59, 999) / 1000;
+            filteredData = filteredData.filter(o => o.createdAt.seconds <= end);
+        }
+        
+        if (currentSort.column) {
+            filteredData.sort((a, b) => {
+                const valA = currentSort.column === 'createdAt' ? a.createdAt.seconds : (a[currentSort.column] || '');
+                const valB = currentSort.column === 'createdAt' ? b.createdAt.seconds : (b[currentSort.column] || '');
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        const total = filteredData.reduce((sum, o) => sum + o.total, 0);
+        document.getElementById('ledger-total-row').innerHTML = `<td colspan="4" style="text-align: right;">Filtered Total</td><td>₹${total.toFixed(2)}</td>`;
+        body.innerHTML = filteredData.length ? filteredData.map(o => `<tr>
+            <td>${o.id}</td><td>${o.shopName}</td><td>${o.customerName}</td>
+            <td>${new Date(o.createdAt.seconds * 1000).toLocaleString()}</td>
+            <td>₹${o.total.toFixed(2)}</td></tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No orders found matching your criteria.</td></tr>`;
+    };
+    
+    renderCustomerLedger = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader"><h2>Customer Ledger</h2></div>
+            <div class="card">
+                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by customer name..."></div>
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="date">Date <span class="sort-indicator">▲</span></th>
+                        <th data-sort="customerName">Customer <span class="sort-indicator">▲</span></th>
+                        <th data-sort="description">Description <span class="sort-indicator">▲</span></th>
+                        <th data-sort="debit">Debit (₹) <span class="sort-indicator">▲</span></th>
+                        <th data-sort="credit">Credit (₹) <span class="sort-indicator">▲</span></th>
+                    </tr></thead>
+                    <tbody id="data-table-body"></tbody>
+                    <tfoot class="table-footer"><tr id="ledger-total-row"></tr></tfoot>
+                </table></div>
+            </div>`;
+        try {
+            const [ordersSnap, topupsSnap, customersSnap] = await Promise.all([
+                getDocs(collection(db, 'orders')),
+                getDocs(query(collection(db, 'topupRequests'), where('status', '==', 'approved'))),
+                getDocs(collection(db, 'customers'))
+            ]);
+            const customersMap = new Map(customersSnap.docs.map(doc => [doc.id, doc.data().name]));
+
+            const transactions = [];
+            ordersSnap.forEach(doc => {
+                const data = doc.data();
+                transactions.push({ type: 'debit', date: data.createdAt, customerName: data.customerName, description: `Purchase (Order #${doc.id.substring(0, 6)})`, debit: data.total, credit: 0 });
+            });
+            topupsSnap.forEach(doc => {
+                const data = doc.data();
+                transactions.push({ type: 'credit', date: data.createdAt, customerName: customersMap.get(data.customerId) || 'Unknown', description: `Wallet Top-up`, debit: 0, credit: data.amount });
+            });
+            originalData = transactions;
+            displayCustomerLedger();
+            document.getElementById('table-search').addEventListener('input', (e) => displayCustomerLedger(e.target.value));
+            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displayCustomerLedger);
+            });
+        } catch (e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="5">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displayCustomerLedger = (searchTerm = '') => {
+        const body = document.getElementById('data-table-body');
+        let filteredData = [...originalData];
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            filteredData = filteredData.filter(t => t.customerName.toLowerCase().includes(lower));
+        }
+        const sortKey = currentSort.column || 'date';
+        const sortDir = currentSort.direction;
+
+        filteredData.sort((a, b) => {
+            const valA = sortKey === 'date' ? a.date.seconds : a[sortKey];
+            const valB = sortKey === 'date' ? b.date.seconds : b[sortKey];
+            if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        const totalDebit = filteredData.reduce((sum, t) => sum + t.debit, 0);
+        const totalCredit = filteredData.reduce((sum, t) => sum + t.credit, 0);
+
+        document.getElementById('ledger-total-row').innerHTML = `<td colspan="3" style="text-align: right;">Grand Totals</td><td>₹${totalDebit.toFixed(2)}</td><td>₹${totalCredit.toFixed(2)}</td>`;
+
+        body.innerHTML = filteredData.length ? filteredData.map(t => `<tr>
+            <td>${new Date(t.date.seconds * 1000).toLocaleString()}</td>
+            <td>${t.customerName}</td>
+            <td>${t.description}</td>
+            <td>${t.debit > 0 ? `₹${t.debit.toFixed(2)}` : '-'}</td>
+            <td>${t.credit > 0 ? `₹${t.credit.toFixed(2)}` : '-'}</td>
+        </tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No transactions found.</td></tr>`;
+    };
+
+    renderPromoCodes = async () => {
+        dashboardContent.innerHTML = `
+            <div class="page-subheader">
+                <h2>Promo Codes</h2>
+                <button id="add-promo-btn" class="btn btn-primary" style="width: auto;">+ Create New</button>
+            </div>
+            <div class="card">
+                <div class="table-container"><table>
+                    <thead><tr>
+                        <th data-sort="code">Code <span class="sort-indicator">▲</span></th>
+                        <th data-sort="type">Type <span class="sort-indicator">▲</span></th>
+                        <th data-sort="value">Value <span class="sort-indicator">▲</span></th>
+                        <th data-sort="minOrder">Min. Order (₹) <span class="sort-indicator">▲</span></th>
+                        <th data-sort="expires">Expires On <span class="sort-indicator">▲</span></th>
+                        <th data-sort="status">Status <span class="sort-indicator">▲</span></th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="data-table-body"><tr><td colspan="7" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
+                </table></div>
+            </div>
+            <div id="promo-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="padding:0;">
+                <form id="promo-form" style="padding:2rem;">
+                    <h2 id="promo-modal-title">Create Promo Code</h2>
+                    <input type="hidden" id="promo-id" />
+                    <div class="form-group"><label for="promo-code">Promo Code</label><input type="text" id="promo-code" required style="text-transform: uppercase;"></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="promo-type">Discount Type</label><select id="promo-type" required><option value="percentage">Percentage (%)</option><option value="fixed">Fixed Amount (₹)</option></select></div>
+                        <div class="form-group"><label for="promo-value">Value</label><input type="number" id="promo-value" required min="0"></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="promo-minOrder">Min. Order Value (₹)</label><input type="number" id="promo-minOrder" min="0" placeholder="Optional"></div>
+                        <div class="form-group"><label for="promo-expires">Expiry Date</label><input type="date" id="promo-expires"></div>
+                    </div>
+                    <div class="form-group"><label for="promo-status">Status</label><select id="promo-status" required><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" id="cancel-promo-modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Code</button>
+                    </div>
+                </form>
+            </div></div>
+        `;
+        try {
+            const snap = await getDocs(collection(db, 'promoCodes'));
+            originalData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            displayPromoCodes();
+             dashboardContent.querySelector('thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (th) handleSort(th.dataset.sort, displayPromoCodes);
+            });
+        } catch(e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="7">Error loading data: ${e.message}</td></tr>`; }
+    };
+
+    displayPromoCodes = () => {
+        const body = document.getElementById('data-table-body');
+        let data = [...originalData];
+        if (currentSort.column) {
+            data.sort((a, b) => {
+                const valA = currentSort.column === 'expires' && a.expires ? a.expires.seconds : a[currentSort.column] || '';
+                const valB = currentSort.column === 'expires' && b.expires ? b.expires.seconds : b[currentSort.column] || '';
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        body.innerHTML = data.length ? data.map(p => `<tr>
+            <td>${p.code}</td><td>${p.type}</td><td>${p.type === 'percentage' ? `${p.value}%` : `₹${p.value}`}</td>
+            <td>${p.minOrder || 'N/A'}</td><td>${p.expires ? new Date(p.expires.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+            <td><span style="color: ${p.status === 'active' ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: bold;">${p.status}</span></td>
+            <td><button class="btn btn-secondary" data-action="edit" data-collection="promoCodes" data-id="${p.id}" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button></td>
+            </tr>`).join('') : `<tr><td colspan="7" style="text-align:center; padding: 2rem;">No promo codes found.</td></tr>`;
+    };
+
+    // --- GENERIC ACTION HANDLER ---
+    dashboardContent.addEventListener('click', async (e) => {
+        const button = e.target.closest('button[data-action]');
+        if (!button) return;
+        
+        const { action, id, collection: collectionName, customerId, amount } = button.dataset;
+        
+        if (action === 'delete') {
+            if (confirm(`Are you sure you want to delete this ${collectionName.slice(0, -1)}? This action cannot be undone.`)) {
+                try {
+                    await deleteDoc(doc(db, collectionName, id));
+                    alert('Deleted successfully.');
+                    originalData = originalData.filter(item => item.id !== id);
+                    if (collectionName === 'shops') displayShops();
+                    else if (collectionName === 'salesmen') displaySalesmen();
+                    else if (collectionName === 'deliveryBoys') displayDeliveryBoys();
+                } catch (error) { alert('Error: ' + error.message); }
+            }
+        } else if (action === 'approve' || action === 'reject') {
+            const newStatus = action === 'approve' ? 'approved' : 'rejected';
+            button.disabled = true;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const customerRef = doc(db, 'customers', customerId);
+                    const requestRef = doc(db, 'topupRequests', id);
+
+                    if (newStatus === 'approved') {
+                        const customerDoc = await transaction.get(customerRef);
+                        if (!customerDoc.exists()) throw new Error("Customer not found.");
+                        const newBalance = (customerDoc.data().wallet || 0) + parseFloat(amount);
+                        transaction.update(customerRef, { wallet: newBalance });
+                    }
+                    transaction.update(requestRef, { status: newStatus });
+                });
+
+                await addDoc(collection(db, 'notifications'), {
+                    customerId: customerId,
+                    message: `Your top-up request for ₹${amount} has been ${newStatus}.`,
+                    read: false,
+                    createdAt: serverTimestamp()
+                });
+                alert(`Request ${newStatus}.`);
+            } catch (error) {
+                alert(`Failed to ${action} request: ${error.message}`);
+                button.disabled = false;
+            }
+        } else if(action === 'edit' && id && collectionName === 'promoCodes') {
+            const promo = originalData.find(p => p.id === id);
+            const modal = document.getElementById('promo-modal');
+            modal.querySelector('#promo-modal-title').textContent = 'Edit Promo Code';
+            modal.querySelector('#promo-id').value = promo.id;
+            modal.querySelector('#promo-code').value = promo.code;
+            modal.querySelector('#promo-type').value = promo.type;
+            modal.querySelector('#promo-value').value = promo.value;
+            modal.querySelector('#promo-minOrder').value = promo.minOrder || '';
+            modal.querySelector('#promo-expires').value = promo.expires ? new Date(promo.expires.seconds * 1000).toISOString().split('T')[0] : '';
+            modal.querySelector('#promo-status').value = promo.status;
+            modal.style.display = 'flex';
+        } else if (action === 'edit' && id && collectionName === 'deliveryBoys') {
+            const user = originalData.find(d => d.id === id);
+            const modal = document.getElementById('delivery-boy-modal');
+            modal.querySelector('#delivery-boy-modal-title').textContent = 'Edit Delivery Boy';
+            modal.querySelector('#delivery-boy-id').value = user.id;
+            modal.querySelector('#delivery-boy-name').value = user.name;
+            modal.querySelector('#delivery-boy-email').value = user.email;
+            modal.querySelector('#delivery-boy-mobile').value = user.mobile;
+            modal.querySelector('#delivery-boy-status').value = user.status;
+            modal.querySelector('#password-form-group').style.display = 'none';
+            modal.style.display = 'flex';
+        } else if (action === 'edit' && id && collectionName === 'salesmen') {
+            const user = originalData.find(d => d.id === id);
+            const modal = document.getElementById('salesman-modal');
+            modal.querySelector('#salesman-modal-title').textContent = 'Edit Salesman';
+            modal.querySelector('#salesman-id').value = user.id;
+            modal.querySelector('#salesman-name').value = user.name;
+            modal.querySelector('#salesman-email').value = user.email;
+            modal.querySelector('#salesman-shop').value = user.shopId;
+            modal.style.display = 'flex';
+        }
+    });
+    
+    dashboardContent.addEventListener('click', (e) => {
+        if (e.target.id === 'add-promo-btn') {
+            const modal = document.getElementById('promo-modal');
+            modal.querySelector('#promo-modal-title').textContent = 'Create Promo Code';
+            modal.querySelector('#promo-form').reset();
+            modal.querySelector('#promo-id').value = '';
+            modal.style.display = 'flex';
+        } else if (e.target.id === 'cancel-promo-modal') {
+            document.getElementById('promo-modal').style.display = 'none';
+        } else if (e.target.id === 'add-delivery-boy-btn') {
+            const modal = document.getElementById('delivery-boy-modal');
+            modal.querySelector('#delivery-boy-modal-title').textContent = 'Add Delivery Boy';
+            modal.querySelector('#delivery-boy-form').reset();
+            modal.querySelector('#delivery-boy-id').value = '';
+            modal.querySelector('#password-form-group').style.display = 'none';
+            modal.style.display = 'flex';
+        } else if (e.target.id === 'cancel-delivery-boy-modal') {
+            document.getElementById('delivery-boy-modal').style.display = 'none';
+        } else if (e.target.id === 'add-salesman-btn') {
+            const modal = document.getElementById('salesman-modal');
+            modal.querySelector('#salesman-modal-title').textContent = 'Add Salesman';
+            modal.querySelector('#salesman-form').reset();
+            modal.querySelector('#salesman-id').value = '';
+            modal.style.display = 'flex';
+        } else if (e.target.id === 'cancel-salesman-modal') {
+            document.getElementById('salesman-modal').style.display = 'none';
+        }
+    });
+
+
+    dashboardContent.addEventListener('submit', async (e) => {
+        if (e.target.id === 'manual-topup-form') {
+            e.preventDefault();
+            const customerId = e.target.elements['customer-select'].value;
+            const amount = parseFloat(e.target.elements['manual-amount'].value);
+            const reason = e.target.elements['manual-reason'].value;
+            if (!customerId || !amount) return alert('Please fill all fields.');
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            try {
+                const customerRef = doc(db, 'customers', customerId);
+                await runTransaction(db, async (transaction) => {
+                    const customerDoc = await transaction.get(customerRef);
+                    const newBalance = (customerDoc.data().wallet || 0) + amount;
+                    transaction.update(customerRef, { wallet: newBalance });
+                });
+                alert(`Successfully added ₹${amount} to the customer's wallet.`);
+                e.target.reset();
+            } catch (error) { alert('Failed to top-up: ' + error.message); } finally { btn.disabled = false; }
+        } else if (e.target.id === 'settings-form') {
+            e.preventDefault();
+            const upiId = e.target.elements.upiId.value;
+            const qrCodeUrl = e.target.elements.qrCodeUrl.value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            try {
+                await setDoc(doc(db, 'settings', 'paymentDetails'), { upiId, qrCodeUrl });
+                alert('Settings saved successfully!');
+            } catch (error) { alert('Error saving settings: ' + error.message); } finally { btn.disabled = false; }
+        } else if (e.target.id === 'promo-form') {
+            e.preventDefault();
+            const id = e.target.elements['promo-id'].value;
+            const data = {
+                code: e.target.elements['promo-code'].value.toUpperCase(),
+                type: e.target.elements['promo-type'].value,
+                value: parseFloat(e.target.elements['promo-value'].value),
+                minOrder: parseFloat(e.target.elements['promo-minOrder'].value) || null,
+                expires: e.target.elements['promo-expires'].value ? new Date(e.target.elements['promo-expires'].value) : null,
+                status: e.target.elements['promo-status'].value
+            };
+            try {
+                const docRef = id ? doc(db, 'promoCodes', id) : doc(collection(db, 'promoCodes'));
+                await setDoc(docRef, data, { merge: true });
+                alert('Promo code saved successfully!');
+                document.getElementById('promo-modal').style.display = 'none';
+                renderPromoCodes();
+            } catch (error) { alert('Error: ' + error.message); }
+        } else if (e.target.id === 'delivery-boy-form') {
+            e.preventDefault();
+            const id = e.target.elements['delivery-boy-id'].value;
+            const data = {
+                name: e.target.elements['delivery-boy-name'].value,
+                email: e.target.elements['delivery-boy-email'].value,
+                mobile: e.target.elements['delivery-boy-mobile'].value,
+                status: e.target.elements['delivery-boy-status'].value
+            };
+            try {
+                if (id) { // Editing existing
+                    await setDoc(doc(db, 'deliveryBoys', id), data, { merge: true });
+                    alert('Delivery boy updated successfully!');
+                } else { // Creating new
+                    const q = query(collection(db, 'deliveryBoys'), where('email', '==', data.email));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        throw new Error('A delivery boy with this email already exists.');
+                    }
+                    
+                    await addDoc(collection(db, 'deliveryBoys'), { ...data, createdAt: serverTimestamp() });
+                    alert('Delivery boy added successfully! They can now create an account with this email.');
+                }
+                document.getElementById('delivery-boy-modal').style.display = 'none';
+                renderDeliveryBoys();
+            } catch (error) { alert('Error: ' + error.message); }
+        } else if (e.target.id === 'salesman-form') {
+            e.preventDefault();
+            const id = e.target.elements['salesman-id'].value;
+            const data = {
+                name: e.target.elements['salesman-name'].value,
+                email: e.target.elements['salesman-email'].value,
+                shopId: e.target.elements['salesman-shop'].value
+            };
+            try {
+                if (id) {
+                    await setDoc(doc(db, 'salesmen', id), data, { merge: true });
+                    alert('Salesman updated!');
+                } else { // Creating new
+                    const q = query(collection(db, 'salesmen'), where('email', '==', data.email));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) throw new Error('A salesman with this email already exists.');
+                    
+                    await addDoc(collection(db, 'salesmen'), { ...data, createdAt: serverTimestamp() });
+                    alert('Salesman added successfully! They can now create an account using this email.');
+                }
+                document.getElementById('salesman-modal').style.display = 'none';
+                renderSalesmen();
+            } catch (error) { alert('Error: ' + error.message); }
+        }
+    });
+
+    const handleNavClick = (e) => {
+        if (!e.target.matches('.nav-buttons .btn')) return;
+        const navId = e.target.id;
+        setActiveNav(navId);
+        cleanupListeners();
+
+        const pageRenderers = {
+            'nav-overview': renderOverview,
+            'nav-shops': renderShops,
+            'nav-salesmen': renderSalesmen,
+            'nav-delivery': renderDeliveryBoys,
+            'nav-topups': renderTopupRequests,
+            'nav-manual-topup': renderManualTopup,
+            'nav-shop-ledger': renderShopLedger,
+            'nav-customer-ledger': renderCustomerLedger,
+            'nav-promo': renderPromoCodes,
+            'nav-settings': renderSettings
+        };
+
+        if (pageRenderers[navId]) {
+            pageRenderers[navId]();
+        }
+        listenForLowStockAlerts();
+    };
+
+    document.querySelector('.nav-buttons').addEventListener('click', handleNavClick);
+  </script>
+
+<script src="./script.js"></script></body></html>
