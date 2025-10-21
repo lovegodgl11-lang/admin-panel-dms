@@ -4,6 +4,7 @@
   "imports": {}
 }</script></head><body>
 
+
   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,7 +127,7 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
                 </form>
                  <p style="text-align: center; margin-top: 1.5rem;">Need an account? <span class="link" id="go-to-signup">Sign Up</span></p>
-                 <p style="text-align: center; margin-top: 1rem;"><a href="./index.html" class="link">Back to Home</a></p>
+                 <p style="text-align: center; margin-top: 1rem;"><a href="https://lovegodgl11-lang.github.io/startup-page-dms/" class="link" target="_top">Back to Home</a></p>
             </div>
         </div>
 
@@ -142,20 +143,18 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
                 </form>
                  <p style="text-align: center; margin-top: 1.5rem;">Already have an account? <span class="link" id="go-to-login">Sign In</span></p>
-                 <p style="text-align: center; margin-top: 1rem;"><a href="https://lovegodgl11-lang.github.io/startup-page-dms/" class="link">Back to Home</a></p>
+                 <p style="text-align: center; margin-top: 1rem;"><a href="https://lovegodgl11-lang.github.io/startup-page-dms/" class="link" target="_top">Back to Home</a></p>
             </div>
         </div>
 
         <div id="admin-dashboard-page" class="page">
             <div class="dashboard-container">
                 <div class="dashboard-header">
-                    <h1>Welcome, Admin! <a href="./index.html" class="link" style="font-size: 0.9rem; font-weight: 500;">(home)</a></h1>
+                    <h1>Welcome, Admin! <a href="https://lovegodgl11-lang.github.io/startup-page-dms/" class="link" style="font-size: 0.9rem; font-weight: 500;" target="_top">(home)</a></h1>
                     <div class="header-actions">
                         <span class="nav-buttons">
                             <button id="nav-overview" class="btn active">Overview</button>
                             <button id="nav-shops" class="btn">Shops</button>
-                            <button id="nav-salesmen" class="btn">Salesmen</button>
-                            <button id="nav-delivery" class="btn">Delivery Boys</button>
                             <button id="nav-topups" class="btn">Top-up Requests</button>
                             <button id="nav-manual-topup" class="btn">Manual Top-up</button>
                             <button id="nav-shop-ledger" class="btn">Shop Ledger</button>
@@ -207,7 +206,7 @@
     let originalData = [];
     let currentSort = { column: null, direction: 'asc' };
     
-    let renderOverview, renderShops, displayShops, renderSalesmen, displaySalesmen, renderShopLedger, displayShopLedger, renderCustomerLedger, displayCustomerLedger, renderSettings, renderTopupRequests, renderManualTopup, listenForLowStockAlerts, renderPromoCodes, displayPromoCodes, renderDeliveryBoys, displayDeliveryBoys;
+    let renderOverview, renderShops, displayShops, renderShopLedger, displayShopLedger, renderCustomerLedger, displayCustomerLedger, renderSettings, renderTopupRequests, renderManualTopup, listenForLowStockAlerts, renderPromoCodes, displayPromoCodes;
 
     const cleanupListeners = () => {
         listeners.forEach(unsubscribe => unsubscribe());
@@ -336,10 +335,13 @@
                 <thead><tr><th>Customer Name</th><th>Amount (₹)</th><th>Screenshot</th><th>Date</th><th>Actions</th></tr></thead>
                 <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center;">Loading...</td></tr></tbody>
             </table></div></div>`;
-        const q = query(collection(db, 'topupRequests'), where('status', '==', 'pending'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'topupRequests'));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const body = document.getElementById('data-table-body');
-            const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(req => req.status === 'pending')
+                .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
             if (requests.length === 0) {
                 body.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No pending requests.</td></tr>`;
                 return;
@@ -451,149 +453,6 @@
                 <button class="btn btn-secondary" data-action="edit" data-id="${s.id}" data-collection="shops" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
                 <button class="btn btn-danger" data-action="delete" data-id="${s.id}" data-collection="shops" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
             </td></tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No shops found.</td></tr>`;
-    };
-    
-    renderSalesmen = async () => {
-        dashboardContent.innerHTML = `
-            <div class="page-subheader">
-                <h2>Registered Salesmen</h2>
-                <button id="add-salesman-btn" class="btn btn-primary" style="width: auto;">+ Add Salesman</button>
-            </div>
-            <div class="card">
-                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by name, email, or shop..."></div>
-                <div class="table-container"><table>
-                    <thead><tr>
-                        <th data-sort="name">Name <span class="sort-indicator">▲</span></th>
-                        <th data-sort="email">Email <span class="sort-indicator">▲</span></th>
-                        <th data-sort="shopName">Shop <span class="sort-indicator">▲</span></th>
-                        <th>Actions</th>
-                    </tr></thead>
-                    <tbody id="data-table-body"><tr><td colspan="4" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
-                </table></div>
-            </div>
-            <div id="salesman-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="padding:0;">
-                <form id="salesman-form" style="padding: 2rem;">
-                    <h2 id="salesman-modal-title" style="margin-bottom: 1.5rem;">Add Salesman</h2>
-                    <input type="hidden" id="salesman-id" />
-                    <div class="form-group"><label for="salesman-name">Full Name</label><input type="text" id="salesman-name" required></div>
-                    <div class="form-group"><label for="salesman-email">Email</label><input type="email" id="salesman-email" required></div>
-                    <div class="form-group"><label for="salesman-shop">Assign to Shop</label><select id="salesman-shop" required><option value="">Loading shops...</option></select></div>
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                        <button type="button" class="btn btn-secondary" id="cancel-salesman-modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Salesman</button>
-                    </div>
-                </form>
-            </div></div>`;
-        try {
-            const [salesmenSnap, shopsSnap] = await Promise.all([getDocs(collection(db, 'salesmen')), getDocs(collection(db, 'shops'))]);
-            const shopsMap = new Map(shopsSnap.docs.map(doc => [doc.id, doc.data().shopName]));
-            originalData = salesmenSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), shopName: shopsMap.get(doc.data().shopId) || 'N/A' }));
-            
-            const select = dashboardContent.querySelector('#salesman-shop');
-            if(select) {
-                select.innerHTML = '<option value="">-- Select a shop --</option>' + shopsSnap.docs.map(doc => `<option value="${doc.id}">${doc.data().shopName}</option>`).join('');
-            }
-
-            displaySalesmen();
-            document.getElementById('table-search').addEventListener('input', (e) => displaySalesmen(e.target.value));
-            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
-                const th = e.target.closest('th[data-sort]');
-                if (th) handleSort(th.dataset.sort, displaySalesmen);
-            });
-        } catch (e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="4">Error loading data: ${e.message}</td></tr>`; }
-    };
-
-    displaySalesmen = (searchTerm = '') => {
-        const body = document.getElementById('data-table-body');
-        let filteredData = [...originalData];
-        if (searchTerm) {
-            const lower = searchTerm.toLowerCase();
-            filteredData = filteredData.filter(s => s.name.toLowerCase().includes(lower) || s.email.toLowerCase().includes(lower) || (s.shopName || '').toLowerCase().includes(lower));
-        }
-        if (currentSort.column) {
-             filteredData.sort((a, b) => {
-                const valA = a[currentSort.column] || ''; const valB = b[currentSort.column] || '';
-                if (typeof valA === 'string') return currentSort.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-        body.innerHTML = filteredData.length ? filteredData.map(s => `<tr>
-            <td>${s.name}</td><td>${s.email}</td><td>${s.shopName}</td>
-            <td style="display:flex; gap:0.5rem">
-                <button class="btn btn-secondary" data-action="edit" data-id="${s.id}" data-collection="salesmen" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
-                <button class="btn btn-danger" data-action="delete" data-id="${s.id}" data-collection="salesmen" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
-            </td></tr>`).join('') : `<tr><td colspan="4" style="text-align:center; padding: 2rem;">No salesmen found.</td></tr>`;
-    };
-
-    renderDeliveryBoys = async () => {
-        dashboardContent.innerHTML = `
-            <div class="page-subheader">
-                <h2>Delivery Boys</h2>
-                <button id="add-delivery-boy-btn" class="btn btn-primary" style="width: auto;">+ Add Delivery Boy</button>
-            </div>
-            <div class="card">
-                <div class="table-controls"><input type="text" id="table-search" class="search-input" placeholder="Search by name, email, or mobile..."></div>
-                <div class="table-container"><table>
-                    <thead><tr>
-                        <th data-sort="name">Name <span class="sort-indicator">▲</span></th>
-                        <th data-sort="email">Email <span class="sort-indicator">▲</span></th>
-                        <th data-sort="mobile">Mobile <span class="sort-indicator">▲</span></th>
-                        <th data-sort="status">Status <span class="sort-indicator">▲</span></th>
-                        <th>Actions</th>
-                    </tr></thead>
-                    <tbody id="data-table-body"><tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading...</td></tr></tbody>
-                </table></div>
-            </div>
-             <div id="delivery-boy-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="padding:0;">
-                <form id="delivery-boy-form" style="padding: 2rem;">
-                    <h2 id="delivery-boy-modal-title" style="margin-bottom: 1.5rem;">Add Delivery Boy</h2>
-                    <input type="hidden" id="delivery-boy-id" />
-                    <div class="form-group"><label for="delivery-boy-name">Full Name</label><input type="text" id="delivery-boy-name" required></div>
-                    <div class="form-group"><label for="delivery-boy-email">Email</label><input type="email" id="delivery-boy-email" required></div>
-                    <div class="form-group"><label for="delivery-boy-mobile">Mobile Number</label><input type="tel" id="delivery-boy-mobile" required></div>
-                    <div class="form-group" id="password-form-group" style="display:none;"><label for="delivery-boy-password">Password</label><input type="password" id="delivery-boy-password" required minlength="6"></div>
-                    <div class="form-group"><label for="delivery-boy-status">Status</label><select id="delivery-boy-status" required><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-                    <p style="font-size: 0.8rem; color: var(--text-light);">Delivery boys will create their own password upon first login.</p>
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                        <button type="button" class="btn btn-secondary" id="cancel-delivery-boy-modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div></div>`;
-        try {
-            const snap = await getDocs(collection(db, 'deliveryBoys'));
-            originalData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            displayDeliveryBoys();
-            document.getElementById('table-search').addEventListener('input', (e) => displayDeliveryBoys(e.target.value));
-            dashboardContent.querySelector('thead').addEventListener('click', (e) => {
-                const th = e.target.closest('th[data-sort]');
-                if (th) handleSort(th.dataset.sort, displayDeliveryBoys);
-            });
-        } catch(e) { document.getElementById('data-table-body').innerHTML = `<tr><td colspan="5">Error loading data: ${e.message}</td></tr>`; }
-    };
-
-    displayDeliveryBoys = (searchTerm = '') => {
-        const body = document.getElementById('data-table-body');
-        let filteredData = [...originalData];
-        if (searchTerm) {
-            const lower = searchTerm.toLowerCase();
-            filteredData = filteredData.filter(d => d.name.toLowerCase().includes(lower) || d.email.toLowerCase().includes(lower) || (d.mobile||'').includes(lower));
-        }
-        if (currentSort.column) {
-            filteredData.sort((a, b) => {
-                const valA = a[currentSort.column] || ''; const valB = b[currentSort.column] || '';
-                return currentSort.direction === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
-            });
-        }
-        body.innerHTML = filteredData.length ? filteredData.map(d => `<tr>
-            <td>${d.name}</td><td>${d.email}</td><td>${d.mobile || 'N/A'}</td>
-            <td><span style="color: ${d.status === 'active' ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: bold;">${d.status}</span></td>
-            <td style="display:flex; gap:0.5rem">
-                <button class="btn btn-secondary" data-action="edit" data-id="${d.id}" data-collection="deliveryBoys" style="padding:0.25rem 0.5rem;font-size:0.8rem">Edit</button>
-                <button class="btn btn-danger" data-action="delete" data-id="${d.id}" data-collection="deliveryBoys" style="padding:0.25rem 0.5rem;font-size:0.8rem">Delete</button>
-            </td></tr>`).join('') : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">No delivery boys found.</td></tr>`;
     };
 
     renderShopLedger = async () => {
@@ -843,8 +702,6 @@
                     alert('Deleted successfully.');
                     originalData = originalData.filter(item => item.id !== id);
                     if (collectionName === 'shops') displayShops();
-                    else if (collectionName === 'salesmen') displaySalesmen();
-                    else if (collectionName === 'deliveryBoys') displayDeliveryBoys();
                 } catch (error) { alert('Error: ' + error.message); }
             }
         } else if (action === 'approve' || action === 'reject') {
@@ -887,26 +744,6 @@
             modal.querySelector('#promo-expires').value = promo.expires ? new Date(promo.expires.seconds * 1000).toISOString().split('T')[0] : '';
             modal.querySelector('#promo-status').value = promo.status;
             modal.style.display = 'flex';
-        } else if (action === 'edit' && id && collectionName === 'deliveryBoys') {
-            const user = originalData.find(d => d.id === id);
-            const modal = document.getElementById('delivery-boy-modal');
-            modal.querySelector('#delivery-boy-modal-title').textContent = 'Edit Delivery Boy';
-            modal.querySelector('#delivery-boy-id').value = user.id;
-            modal.querySelector('#delivery-boy-name').value = user.name;
-            modal.querySelector('#delivery-boy-email').value = user.email;
-            modal.querySelector('#delivery-boy-mobile').value = user.mobile;
-            modal.querySelector('#delivery-boy-status').value = user.status;
-            modal.querySelector('#password-form-group').style.display = 'none';
-            modal.style.display = 'flex';
-        } else if (action === 'edit' && id && collectionName === 'salesmen') {
-            const user = originalData.find(d => d.id === id);
-            const modal = document.getElementById('salesman-modal');
-            modal.querySelector('#salesman-modal-title').textContent = 'Edit Salesman';
-            modal.querySelector('#salesman-id').value = user.id;
-            modal.querySelector('#salesman-name').value = user.name;
-            modal.querySelector('#salesman-email').value = user.email;
-            modal.querySelector('#salesman-shop').value = user.shopId;
-            modal.style.display = 'flex';
         }
     });
     
@@ -919,23 +756,6 @@
             modal.style.display = 'flex';
         } else if (e.target.id === 'cancel-promo-modal') {
             document.getElementById('promo-modal').style.display = 'none';
-        } else if (e.target.id === 'add-delivery-boy-btn') {
-            const modal = document.getElementById('delivery-boy-modal');
-            modal.querySelector('#delivery-boy-modal-title').textContent = 'Add Delivery Boy';
-            modal.querySelector('#delivery-boy-form').reset();
-            modal.querySelector('#delivery-boy-id').value = '';
-            modal.querySelector('#password-form-group').style.display = 'none';
-            modal.style.display = 'flex';
-        } else if (e.target.id === 'cancel-delivery-boy-modal') {
-            document.getElementById('delivery-boy-modal').style.display = 'none';
-        } else if (e.target.id === 'add-salesman-btn') {
-            const modal = document.getElementById('salesman-modal');
-            modal.querySelector('#salesman-modal-title').textContent = 'Add Salesman';
-            modal.querySelector('#salesman-form').reset();
-            modal.querySelector('#salesman-id').value = '';
-            modal.style.display = 'flex';
-        } else if (e.target.id === 'cancel-salesman-modal') {
-            document.getElementById('salesman-modal').style.display = 'none';
         }
     });
 
@@ -943,9 +763,9 @@
     dashboardContent.addEventListener('submit', async (e) => {
         if (e.target.id === 'manual-topup-form') {
             e.preventDefault();
-            const customerId = e.target.elements['customer-select'].value;
-            const amount = parseFloat(e.target.elements['manual-amount'].value);
-            const reason = e.target.elements['manual-reason'].value;
+            const customerId = document.getElementById('customer-select').value;
+            const amount = parseFloat(document.getElementById('manual-amount').value);
+            const reason = document.getElementById('manual-reason').value;
             if (!customerId || !amount) return alert('Please fill all fields.');
 
             const btn = e.target.querySelector('button[type="submit"]');
@@ -962,8 +782,8 @@
             } catch (error) { alert('Failed to top-up: ' + error.message); } finally { btn.disabled = false; }
         } else if (e.target.id === 'settings-form') {
             e.preventDefault();
-            const upiId = e.target.elements.upiId.value;
-            const qrCodeUrl = e.target.elements.qrCodeUrl.value;
+            const upiId = document.getElementById('upiId').value;
+            const qrCodeUrl = document.getElementById('qrCodeUrl').value;
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             try {
@@ -972,14 +792,14 @@
             } catch (error) { alert('Error saving settings: ' + error.message); } finally { btn.disabled = false; }
         } else if (e.target.id === 'promo-form') {
             e.preventDefault();
-            const id = e.target.elements['promo-id'].value;
+            const id = document.getElementById('promo-id').value;
             const data = {
-                code: e.target.elements['promo-code'].value.toUpperCase(),
-                type: e.target.elements['promo-type'].value,
-                value: parseFloat(e.target.elements['promo-value'].value),
-                minOrder: parseFloat(e.target.elements['promo-minOrder'].value) || null,
-                expires: e.target.elements['promo-expires'].value ? new Date(e.target.elements['promo-expires'].value) : null,
-                status: e.target.elements['promo-status'].value
+                code: document.getElementById('promo-code').value.toUpperCase(),
+                type: document.getElementById('promo-type').value,
+                value: parseFloat(document.getElementById('promo-value').value),
+                minOrder: parseFloat(document.getElementById('promo-minOrder').value) || null,
+                expires: document.getElementById('promo-expires').value ? new Date(document.getElementById('promo-expires').value) : null,
+                status: document.getElementById('promo-status').value
             };
             try {
                 const docRef = id ? doc(db, 'promoCodes', id) : doc(collection(db, 'promoCodes'));
@@ -987,55 +807,6 @@
                 alert('Promo code saved successfully!');
                 document.getElementById('promo-modal').style.display = 'none';
                 renderPromoCodes();
-            } catch (error) { alert('Error: ' + error.message); }
-        } else if (e.target.id === 'delivery-boy-form') {
-            e.preventDefault();
-            const id = e.target.elements['delivery-boy-id'].value;
-            const data = {
-                name: e.target.elements['delivery-boy-name'].value,
-                email: e.target.elements['delivery-boy-email'].value,
-                mobile: e.target.elements['delivery-boy-mobile'].value,
-                status: e.target.elements['delivery-boy-status'].value
-            };
-            try {
-                if (id) { // Editing existing
-                    await setDoc(doc(db, 'deliveryBoys', id), data, { merge: true });
-                    alert('Delivery boy updated successfully!');
-                } else { // Creating new
-                    const q = query(collection(db, 'deliveryBoys'), where('email', '==', data.email));
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) {
-                        throw new Error('A delivery boy with this email already exists.');
-                    }
-                    
-                    await addDoc(collection(db, 'deliveryBoys'), { ...data, createdAt: serverTimestamp() });
-                    alert('Delivery boy added successfully! They can now create an account with this email.');
-                }
-                document.getElementById('delivery-boy-modal').style.display = 'none';
-                renderDeliveryBoys();
-            } catch (error) { alert('Error: ' + error.message); }
-        } else if (e.target.id === 'salesman-form') {
-            e.preventDefault();
-            const id = e.target.elements['salesman-id'].value;
-            const data = {
-                name: e.target.elements['salesman-name'].value,
-                email: e.target.elements['salesman-email'].value,
-                shopId: e.target.elements['salesman-shop'].value
-            };
-            try {
-                if (id) {
-                    await setDoc(doc(db, 'salesmen', id), data, { merge: true });
-                    alert('Salesman updated!');
-                } else { // Creating new
-                    const q = query(collection(db, 'salesmen'), where('email', '==', data.email));
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) throw new Error('A salesman with this email already exists.');
-                    
-                    await addDoc(collection(db, 'salesmen'), { ...data, createdAt: serverTimestamp() });
-                    alert('Salesman added successfully! They can now create an account using this email.');
-                }
-                document.getElementById('salesman-modal').style.display = 'none';
-                renderSalesmen();
             } catch (error) { alert('Error: ' + error.message); }
         }
     });
@@ -1049,8 +820,6 @@
         const pageRenderers = {
             'nav-overview': renderOverview,
             'nav-shops': renderShops,
-            'nav-salesmen': renderSalesmen,
-            'nav-delivery': renderDeliveryBoys,
             'nav-topups': renderTopupRequests,
             'nav-manual-topup': renderManualTopup,
             'nav-shop-ledger': renderShopLedger,
